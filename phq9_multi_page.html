@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>PHQ-9 แบบประเมิน</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; background: #f9f9f9; }
+    .page { display: none; }
+    .active { display: block; }
+    .question { margin-bottom: 15px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    button { margin-top: 15px; padding: 10px 20px; font-size: 16px; border: none; border-radius: 6px; background-color: #4CAF50; color: white; cursor: pointer; }
+    button:hover { background-color: #45a049; }
+    #resultBox { margin-top: 20px; font-size: 18px; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <!-- หน้า 1: แบบประเมิน -->
+  <div class="page active" id="page1">
+    <h1>แบบประเมินภาวะซึมเศร้า PHQ-9</h1>
+    <form id="phq9-form"></form>
+    <button onclick="calculateScore()">ส่งคำตอบ</button>
+  </div>
+
+  <!-- หน้า 2: ผลลัพธ์ -->
+  <div class="page" id="page2">
+    <h2>ผลลัพธ์แบบประเมิน</h2>
+    <div id="resultBox"></div>
+    <button onclick="goToPage(3)">ดูสาเหตุของภาวะซึมเศร้า</button>
+  </div>
+
+  <!-- หน้า 3: สาเหตุ -->
+  <div class="page" id="page3">
+    <h2>สาเหตุของภาวะซึมเศร้า</h2>
+    <ul>
+      <li>พันธุกรรมหรือประวัติครอบครัว</li>
+      <li>ความเครียดเรื้อรัง เช่น ปัญหาการเงินหรือความสัมพันธ์</li>
+      <li>การเปลี่ยนแปลงของสารเคมีในสมอง</li>
+      <li>ประสบการณ์กระทบกระเทือนจิตใจในอดีต</li>
+    </ul>
+    <button onclick="goToPage(2)">ย้อนกลับ</button>
+    <button onclick="goToPage(4)">ไปที่คำแนะนำ</button>
+  </div>
+
+  <!-- หน้า 4: คำแนะนำ -->
+  <div class="page" id="page4">
+    <h2>คำแนะนำเบื้องต้น</h2>
+    <ul>
+      <li>หมั่นออกกำลังกายสม่ำเสมอ</li>
+      <li>พูดคุยกับคนที่ไว้ใจ หรือผู้เชี่ยวชาญ</li>
+      <li>นอนพักผ่อนให้เพียงพอ</li>
+      <li>หากอาการรุนแรง ควรปรึกษาจิตแพทย์ทันที</li>
+    </ul>
+    <button onclick="goToPage(3)">ย้อนกลับ</button>
+  </div>
+
+  <script>
+    const questions = [
+      "เบื่อ ทำอะไร ๆ ก็ไม่เพลิดเพลิน", "ไม่มีความสุข ซึมเศร้า หรือท้อแท้",
+      "หลับยาก หรือหลับมากไป", "เหนื่อยง่าย หรือไม่มีแรง",
+      "เบื่ออาหาร หรือกินมากเกินไป", "รู้สึกไม่ดีกับตัวเอง คิดว่าล้มเหลว",
+      "สมาธิไม่ค่อยดี", "กระสับกระส่าย หรือช้ากว่าปกติ",
+      "คิดทำร้ายตัวเอง หรืออยากตาย"
+    ];
+    const options = [
+      { text: "ไม่เลย", value: 0 }, { text: "บางวัน", value: 1 },
+      { text: "บ่อยครั้ง", value: 2 }, { text: "เกือบทุกวัน", value: 3 }
+    ];
+
+    const form = document.getElementById("phq9-form");
+    questions.forEach((q, i) => {
+      const div = document.createElement("div");
+      div.className = "question";
+      div.innerHTML = `<p>${i+1}. ${q}</p>`;
+      options.forEach(o => {
+        div.innerHTML += `<label><input type="radio" name="q${i}" value="${o.value}"> ${o.text}</label><br>`;
+      });
+      form.appendChild(div);
+    });
+
+    function calculateScore() {
+      let score = 0;
+      for (let i = 0; i < questions.length; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (!selected) {
+          alert("โปรดตอบให้ครบทุกข้อ");
+          return;
+        }
+        score += parseInt(selected.value);
+      }
+
+      let level = "";
+      if (score <= 4) level = "ปกติ";
+      else if (score <= 9) level = "ซึมเศร้าระดับเล็กน้อย";
+      else if (score <= 14) level = "ซึมเศร้าระดับปานกลาง";
+      else if (score <= 19) level = "ซึมเศร้าระดับค่อนข้างรุนแรง";
+      else level = "ซึมเศร้าระดับรุนแรง";
+
+      document.getElementById("resultBox").innerHTML = 
+        `คุณได้คะแนน <strong>${score}</strong><br>ระดับภาวะซึมเศร้า: <strong>${level}</strong>`;
+
+      goToPage(2);
+    }
+
+    function goToPage(n) {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.getElementById("page" + n).classList.add("active");
+    }
+  </script>
+</body>
+</html>
